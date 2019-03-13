@@ -24,7 +24,7 @@ int main() {
     char logcwd[500];
 
     struct passwd *pw = getpwuid(getuid());
-
+    //To get home directory
     const char *homedir = pw->pw_dir;
 
     pid = fork();
@@ -49,12 +49,13 @@ int main() {
 
     child_id = fork();
     if (child_id == 0) {
+        //Creating log dir if not exist
         char *execargv[4] = {"", "-p", logcwd, NULL};
         execv("/bin/mkdir", execargv);
     }
-
     while ((wait(&statuschild)) > 0);
     kill(child_id, SIGKILL);
+
 
     if ((chdir("/")) < 0) {
         exit(EXIT_FAILURE);
@@ -64,6 +65,7 @@ int main() {
     close(STDOUT_FILENO);
     close(STDERR_FILENO);
 
+    //Storing daemon pid to /path/to/home/log/.daemonid
     sprintf(cmd, "%s/%s",logcwd, ".daemonid");
     FILE *file = fopen(cmd, "a");
     if (file) {
@@ -73,6 +75,7 @@ int main() {
     
     while(1) {
         if (minute%30==0) {
+            //Getting time
             t = time(NULL);
             tm = *localtime(&t);
             sprintf(timestr,"%02d:%02d:%04d-%02d:%02d", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min);
@@ -80,6 +83,7 @@ int main() {
 
         child_id = fork();
         if (child_id==0) {
+            //Creating /path/to/home/log/[date] directory if not exist
             sprintf(cmd,"%s/%s", logcwd, timestr);
             char *execargv[4] = {"", "-p", cmd, NULL};
             execv("/bin/mkdir", execargv);
@@ -88,8 +92,10 @@ int main() {
         kill(child_id, SIGKILL);
 
         minute++;
+
         child_id = fork();
         if (child_id==0) {
+            //Creating backup of syslog file
             sprintf(cmd,"%s/%s/log%d.log", logcwd, timestr,minute);
             char *execargv[4] = {"", "/var/log/syslog", cmd, NULL};
             execv("/bin/cp", execargv);
@@ -97,7 +103,7 @@ int main() {
         while ((wait(&statuschild)) > 0);
         kill(child_id, SIGKILL);
 
-        sleep(1);
+        sleep(60);
     }
 
     exit(EXIT_SUCCESS);

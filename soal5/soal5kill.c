@@ -19,7 +19,6 @@ int main(int argc, char** argv) {
     FILE *file = fopen(cmd, "r");
     if (file) {
         while(fgets(pid, sizeof(pid), file)){
-            printf("%s\n",pid);
             kill(atoi(pid), SIGKILL);
         }
     }
