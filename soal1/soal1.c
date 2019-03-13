@@ -1,3 +1,4 @@
+#include <sys/wait.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdlib.h>
@@ -16,17 +17,13 @@ int main(int argc, char **args) {
     char namaGambar[500];
     char namaGambarSource[500];
 
+    pid_t pid, sid, child_id, childmkdir_id;
+    int statuschild, statuschildmkdir;
+
     if (argc < 3) {
         printf("./cmdfile /path/images/from /path/images/to\n");
         return 0;
     }
-
-    if (fork() == 0) {
-        char *argv[4] = {"", "-p", args[2], NULL};
-        execv("/bin/mkdir", argv);
-    }
-
-    pid_t pid, sid;
 
     pid = fork();
 
@@ -55,6 +52,15 @@ int main(int argc, char **args) {
     close(STDERR_FILENO);
 
     while(1) {
+        childmkdir_id = fork();
+        if (childmkdir_id == 0) {
+            char *argv[4] = {"", "-p", args[2], NULL};
+            execv("/bin/mkdir", argv);
+        }
+        
+        while ((wait(&statuschildmkdir)) > 0);
+        kill(childmkdir_id, SIGKILL);
+
         d = opendir(args[1]);
         if (d) {
             while ((dir = readdir(d)) != NULL) {
@@ -68,9 +74,16 @@ int main(int argc, char **args) {
                     strcpy(namaGambarSource, args[1]);
                     strcat(namaGambarSource, namafile);
 
-                    if (fork() == 0) {
+                    child_id = fork();
+                    if (child_id == 0) {
                         char *argv[4] = {"", namaGambarSource, namaGambar, NULL};
                         execv("/bin/cp", argv);
+                    }
+                    else
+                    {
+                        while ((wait(&statuschild)) > 0);
+                        // prevent from creating zombie proccess
+                        kill(child_id, SIGKILL);
                     }
                 }
             }
