@@ -12,15 +12,15 @@
 #include <pwd.h>
 
 int main() {
-    pid_t pid, sid;
+    pid_t pid, sid, child_id;
     int minute = 0;
     int statuschild;
-    pid_t child_id;
+
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
+
     char timestr[50];
     char cmd[500];
-    char minutestr[100];
     char logcwd[500];
 
     struct passwd *pw = getpwuid(getuid());
@@ -64,10 +64,12 @@ int main() {
     close(STDOUT_FILENO);
     close(STDERR_FILENO);
 
-    // sprintf(cmd, "%s/%s",logcwd, ".daemonid");
-    // FILE *file = fopen("/root/log/.cobaaja", "w");
-    // //sprintf(cmd,"%d", (int)sid);
-    // fputs("cmd", file);
+    sprintf(cmd, "%s/%s",logcwd, ".daemonid");
+    FILE *file = fopen(cmd, "a");
+    if (file) {
+        fprintf(file, "%d\n",(int) sid);
+    }
+    fclose(file);
     
     while(1) {
         if (minute%30==0) {

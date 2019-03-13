@@ -4,8 +4,26 @@
 #include<string.h>
 #include<stdio.h>
 #include <time.h>
+#include <pwd.h>
+#include <stdlib.h>
 
 int main(int argc, char** argv) {
-    char *execargv[4] = {"", "-c", "if [ -e ~/log/.daemonid ]; then cat ~/log/.daemonid | xargs kill > /dev/null 2>&1; rm ~/log/.daemonid; fi", NULL};
-    execv("/bin/bash", execargv);
+    char cmd[500];
+    char pid[100];
+    
+    struct passwd *pw = getpwuid(getuid());
+
+    const char *homedir = pw->pw_dir;
+
+    sprintf(cmd, "%s/log/%s",homedir, ".daemonid");
+    FILE *file = fopen(cmd, "r");
+    if (file) {
+        while(fgets(pid, sizeof(pid), file)){
+            printf("%s\n",pid);
+            kill(atoi(pid), SIGKILL);
+        }
+    }
+    fclose(file);
+    file = fopen(cmd, "w");
+    fclose(file);
 }
