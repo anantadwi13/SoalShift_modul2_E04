@@ -21,7 +21,7 @@ int main(int argc, char **args) {
     int statuschild, statuschildmkdir;
 
     if (argc < 3) {
-        printf("./cmdfile /path/images/from /path/images/to\n");
+        printf("Usage:\n%s /path/images/from /path/images/to\n", args[0]);
         return 0;
     }
 
