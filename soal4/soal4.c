@@ -62,7 +62,7 @@ int main() {
 	}
 	*/
 
-    stat("/home//Documents/makanan/makan_enak.txt", &details);
+    stat("/home/arisatox/Documents/makanan/makan_enak.txt", &details);
 
     char *waktu2 = ctime(&details.st_atime);
 	//printf("\n%s", waktu2);
