@@ -3,31 +3,49 @@
 #include <unistd.h>
 #include<stdio.h>
 
-int main(int argc, char** argv) {
-    pid_t child_id;
-    pid_t grandchild_id;
-    int statuschild;
-    int statusgrandchild;
+int main()
+{
+   pid_t child_id;
+   pid_t grandchild_id;
+   int statuschild;
+   int statusgrandchild;
 
-    child_id = fork();
+   child_id = fork();
 
-    if (child_id == 0) {
-        grandchild_id = fork();
+   if (child_id == 0) 
+   {
+      grandchild_id = fork(); 
 
-        if (grandchild_id == 0) {
-            char *execargv[4] = {"", "-oq", argv[1], NULL};
-            execv("/usr/bin/unzip", execargv);
-        }
-        else
-        {
-            while ((wait(&statusgrandchild)) > 0);
-            char *execargv[4] = {"","-c", "ls campur2/*.txt | awk 'BEGIN {FS=\"/\"} {print $2}' > daftar.txt", NULL};
-            execv("/bin/bash", execargv);
-        }
-    } else {
-        while ((wait(&statuschild)) > 0);
+      if (grandchild_id == 0) 
+      {
+            char *argv[4] = {"unzip","campur2.zip",NULL};
+            execv("/usr/bin/unzip", argv);
+      }
+      else
+      {
 
-        char *execargv[4] = {"","-c", "chmod 666 daftar.txt", NULL};
-        execv("/bin/bash", execargv);
-    }
+        while ((wait(&statusgrandchild)) > 0);
+
+        char *argv[] = {"touch", "daftar.txt", NULL};
+        execv("/usr/bin/touch", argv);    
+
+      }
+   } 
+   else 
+   {
+
+      while ((wait(&statuschild)) > 0);
+      
+      FILE *fp,*fp2;
+      char path[50];
+      fp = popen("ls campur2","r");
+      fp2 = fopen("daftar.txt", "w");
+
+      while (fgets(path, 50, fp))
+      {
+         fprintf(fp2,"%s\n",path);
+      }
+      fclose(fp2);
+      pclose(fp);
+   }
 }
