@@ -62,7 +62,7 @@ int main() {
 	}
 	*/
 
-    stat("/home/arisatox/Documents/makanan/makan_enak.txt", &details);
+    stat("/home/anantadwi13/Documents/makanan/makan_enak.txt", &details);
 
     char *waktu2 = ctime(&details.st_atime);
 	//printf("\n%s", waktu2);
@@ -87,12 +87,12 @@ int main() {
     dif2=((temp1[6]-'0')*10) + (temp1[7]-'0') - ((temp2[6]-'0')*10) - (temp2[7]-'0');
     dif3=((temp1[9]-'0')*10) + (temp1[10]-'0') - ((temp2[9]-'0')*10) - (temp2[10]-'0');
 	//printf("%d %d %d",dif1, dif2, dif3);
-
-    if (daydif == 0 && dif1 == 0 && dif2 == 0 && dif3 <= 30)
+    int second = dif1*3600 + dif2*60 + dif3;
+    if (daydif == 0 && second <= 30)
     {
       char temp3[200];
       counter++;
-      sprintf(temp3,"/home/arisatox/Documents/makanan/makan_sehat%d.txt",counter);
+      sprintf(temp3,"/home/anantadwi13/Documents/makanan/makan_sehat%d.txt",counter);
       FILE *fPoint;
       fPoint = fopen(temp3, "a");
       fclose(fPoint);
