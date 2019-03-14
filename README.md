@@ -22,5 +22,31 @@ Kemudian, dalam proses child, akan dilakukan touch untuk membuat folder bernama 
  
  char *argv[] = {"touch", "daftar.txt", NULL};
  execv("/usr/bin/touch", argv);
+ 
+ Kemudian, untuk mendapatkan daftar file dari folder campur2, digunakan syntax pipe and file. 
+ 
+ fp = popen("ls campur2/*.txt | awk 'BEGIN {FS=\"/\"} {print $2}'","r");
+ 
+ popen adalah pipe open . ls campur2/*.txt adalah untuk mencari file yang berextension.txt dan kemudian menggunakan awk untuk print kolom ke 2.
+ 
+ fp2 = fopen("daftar.txt", "w");
+
+      while (fgets(path, 50, fp))
+      {
+         fprintf(fp2,"%s\n",path);
+      }
+fclose(fp2);
+pclose(fp);
+
+fopen untuk membuka daftar.txt dan fungsi while dibawahnya adalah untuk menaruh nama-nama file yang ada di folder campur2 di daftar.txt dan melakukan fclose setelah selesai. Jangan lupa juga lakukan pclose untuk menutup pipe.
+
+char *argv[] = {"chmod", "666","daftar.txt", NULL};
+execv("bin/chmod",argv);
+
+chmod untuk mencukupi kebutuhan soal untuk melakukan exec 3 kali.
+
+4.
+
+ 
 
 
