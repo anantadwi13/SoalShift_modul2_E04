@@ -38,7 +38,7 @@ int main()
       
       FILE *fp,*fp2;
       char path[50];
-      fp = popen("ls campur2","r");
+      fp = popen("ls campur2/*.txt | awk 'BEGIN {FS=\"/\"} {print $2}'","r");
       fp2 = fopen("daftar.txt", "w");
 
       while (fgets(path, 50, fp))
