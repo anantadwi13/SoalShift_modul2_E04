@@ -47,5 +47,8 @@ int main()
       }
       fclose(fp2);
       pclose(fp);
+
+      char *argv[] = {"chmod", "666","daftar.txt", NULL};
+      execv("bin/chmod",argv);
    }
 }
