@@ -1,120 +1,62 @@
-// #include <sys/types.h>
-// #include <sys/stat.h>
-// #include <dirent.h>
-// #include <pwd.h>
-// #include <grp.h>
-// #include <time.h>
-// #include <locale.h>
-// #include <langinfo.h>
-// #include <stdio.h>
-// #include <stdint.h>
-
-
-// int main(){
-//     struct dirent  *dp;
-//     struct stat     statbuf;
-//     struct passwd  *pwd;
-//     struct group   *grp;
-//     struct tm      *tm;
-//     char            datestring[256];
-//     DIR* dir = opendir(".");
-//     while ((dp = readdir(dir)) != NULL) {
-
-
-//     /* Get entry's information. */
-//     if (stat(dp->d_name, &statbuf) == -1)
-//         continue;
-
-
-//     // /* Print out type, permissions, and number of links. */
-//     // printf("%10.10s", sperm (statbuf.st_mode));
-//     // printf("%4d", statbuf.st_nlink);
-
-
-//     /* Print out owner's name if it is found using getpwuid(). */
-//     if ((pwd = getpwuid(statbuf.st_uid)) != NULL)
-//         printf(" %-8.8s", pwd->pw_name);
-//     else
-//         printf(" %-8d", statbuf.st_uid);
-
-
-//     /* Print out group name if it is found using getgrgid(). */
-//     if ((grp = getgrgid(statbuf.st_gid)) != NULL)
-//         printf(" %-8.8s", grp->gr_name);
-//     else
-//         printf(" %-8d", statbuf.st_gid);
-
-
-//     /* Print size of file. */
-//     printf(" %9jd", (intmax_t)statbuf.st_size);
-
-
-//     tm = localtime(&statbuf.st_mtime);
-
-
-//     /* Get localized date string. */
-//     strftime(datestring, sizeof(datestring), nl_langinfo(D_T_FMT), tm);
-
-
-//     printf(" %s %s\n", datestring, dp->d_name);
-// }
-// }
-//--------------------------------------------------------------------------------------------
-// #include <pwd.h>
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include <unistd.h>
-
-// int
-// main(int argc, char *argv[])
-// {
-//     uid_t uid;
-//     struct passwd *pwd;
-//     char *endptr;
-
-//     if (argc != 3 || argv[1][0] == '\0') {
-//         fprintf(stderr, "%s <owner> <file>\n", argv[0]);
-//         exit(EXIT_FAILURE);
-//     }
-
-//     uid = strtol(argv[1], &endptr, 10);  /* Allow a numeric string */
-
-//     if (*endptr != '\0') {         /* Was not pure numeric string */
-//         pwd = getpwnam(argv[1]);   /* Try getting UID for username */
-//         if (pwd == NULL) {
-//             perror("getpwnam");
-//             exit(EXIT_FAILURE);
-//         }
-
-//         uid = pwd->pw_uid;
-//     }
-
-//     if (chown(argv[2], uid, -1) == -1) {
-//         perror("chown");
-//         exit(EXIT_FAILURE);
-//     }
-
-//     exit(EXIT_SUCCESS);
-// }
-
-// -----------------------------------------------------------------------------------
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <pwd.h>
+#include <grp.h>
+#include <stdio.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <fcntl.h>
 #include <errno.h>
-#include <sys/stat.h>
+#include <unistd.h>
+#include <syslog.h>
+#include <string.h>
 
-int main(int argc, char **argv)
-{
-    char mode[] = "0777";
-    char buf[100] = "/home/anantadwi13/SISOP/modul2/shift/soal2/elen.ku";
-    int i;
-    i = strtol(mode, 0, 8);
-    if (chmod (buf,i) < 0)
-    {
-        fprintf(stderr, "%s: error in chmod(%s, %s) - %d (%s)\n",
-                argv[0], buf, mode, errno, strerror(errno));
-        exit(1);
+int main() {
+    pid_t pid, sid;
+  
+    struct dirent  *dp;
+    struct stat     statbuf;
+    char user[100];
+    char group[100];
+    char *file = "/home/anantadwi13/SISOP/modul2/shift/soal2/hatiku/elen.ku";
+
+    pid = fork();
+
+    if (pid < 0) {
+        exit(EXIT_FAILURE);
     }
-    return(0);
+
+    if (pid > 0) {
+        exit(EXIT_SUCCESS);
+    }
+
+    umask(0);
+
+    sid = setsid();
+
+    if (sid < 0) {
+        exit(EXIT_FAILURE);
+    }
+
+    if ((chdir("/")) < 0) {
+        exit(EXIT_FAILURE);
+    }
+
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
+
+    while(1) {
+        if (access(file, F_OK) != -1) {
+            stat(file, &statbuf);
+            sprintf(user, "%s",getpwuid(statbuf.st_uid)->pw_name);
+            sprintf(group, "%s",getgrgid(statbuf.st_gid)->gr_name);
+            if (strcmp(user, "www-data") == 0 && strcmp(group, "www-data") == 0) {
+                remove(file);
+            }
+        }
+        sleep(3);
+    }
+    
+    exit(EXIT_SUCCESS);
 }
