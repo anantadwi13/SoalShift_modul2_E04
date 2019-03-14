@@ -1,5 +1,43 @@
 # SoalShift_modul2_E04
 
+## No 1
+### Soal
+Elen mempunyai pekerjaan pada studio sebagai fotografer. Suatu hari ada seorang klien yang bernama Kusuma yang meminta untuk mengubah nama file yang memiliki ekstensi .png menjadi “[namafile]_grey.png”. Karena jumlah file yang diberikan Kusuma tidak manusiawi, maka Elen meminta bantuan kalian untuk membuat suatu program C yang dapat mengubah nama secara otomatis dan diletakkan pada direktori /home/[user]/modul2/gambar.
+
+Catatan : Tidak boleh menggunakan crontab.
+### Jawab 
+Membuat daemon yang akan menjalankan perintah berikut setiap 10 detik :
+1. Membuat direktori baru pada destination path
+2. Mengecek apakah file dengan ekstensi .png ada di folder source
+3. Jika ada maka program akan mengambil nama file tersebut lalu menghapus string `.png` dan menggantikannya dengan string `_grey.png`
+4. Setelah itu program akan mengcopy file dari nama file semula dan menempatkannya ke destination path dengan menggunakan nama dari string pada nomor 3
+
+Usage :
+``` bash
+./soal1 /path/images/source /path/images/destination
+```
+
+## No 2
+### Soal
+Pada suatu hari Kusuma dicampakkan oleh Elen karena Elen dimenangkan oleh orang lain. Semua kenangan tentang Elen berada pada file bernama “elen.ku” pada direktori “hatiku”. Karena sedih berkepanjangan, tugas kalian sebagai teman Kusuma adalah membantunya untuk menghapus semua kenangan tentang Elen dengan membuat program C yang bisa mendeteksi owner dan group dan menghapus file “elen.ku” setiap 3 detik dengan syarat ketika owner dan grupnya menjadi “www-data”. Ternyata kamu memiliki kendala karena permission pada file “elen.ku”. Jadi, ubahlah permissionnya menjadi 777. Setelah kenangan tentang Elen terhapus, maka Kusuma bisa move on.
+
+Catatan: Tidak boleh menggunakan crontab
+
+### Jawab
+Membuat daemon yang akan menjalankan perintah berikut setiap 3 detik :
+1. Mengecek apakah file `elen.ku` ada di folder `hatiku`
+2. Melihat user dan group dari file tersebut
+3. Jika user dan group file tersebut sama dengan `www-data` maka file tersebut akan dihapus
+
+Cara mengganti user dan group file elen.ku :
+```bash
+sudo chown www-data:www-data /path/to/elen.ku
+```
+Cara mengganti permission file elen.ku :
+```bash
+sudo chmod 777 /path/to/elen.ku
+```
+
 ## No 3
 ### Soal
 Diberikan file campur2.zip. Di dalam file tersebut terdapat folder “campur2”. 
@@ -118,7 +156,29 @@ if (daydif == 0 && second <= 30)
 
 Kemudian tambahkan sleep(5) untuk menjalankan daemon setiap 5 detik .
 
+## No 5
+### Soal
+Kerjakan poin a dan b di bawah:
+- Buatlah program c untuk mencatat log setiap menit dari file log pada syslog ke /home/[user]/log/[dd:MM:yyyy-hh:mm]/log#.log
+   
+   Ket:
+   - Per 30 menit membuat folder /[dd:MM:yyyy-hh:mm]
+   - Per menit memasukkan log#.log ke dalam folder tersebut 
+   - ‘#’ : increment per menit. Mulai dari 1.
+ - Buatlah program c untuk menghentikan program di atas.
 
- 
+NB: Dilarang menggunakan crontab dan tidak memakai argumen ketika menjalankan program.
+### Jawab
+Membuat daemon yang akan menjalankan perintah berikut setiap 1 menit :
+1. Setiap 30 menit mengambil waktu saat ini dengan format `dd:MM:yyyy-hh:mm` dan menyimpan ke variable `timestr`
+2. Membuat folder baru pada `/path/to/log` dengan nama sesuai isi variable `timestr`
+3. Membuat backup dengan cara mengcopy file pada `/var/log/syslog` ke dalam folder yang dibuat pada langkah ke-2
 
+Cara menghentikan program :
+1. Mengecek apakah file `/path/to/log/.daemonid` ada atau tidak
+2. Jika ada, membaca isi file tersebut lalu menghentikan process yang memiliki pid sesuai dengan isi file tersebut dengan menggunakan `kill(pid, SIGKILL)`
+3. Mengosongkan isi file tersebut, menandakan  tidak ada process yang berjalan
 
+Catatan :
+- Ketika membuat daemon, pid dari daemon tersebut disimpan kedalam file `/path/to/log/.daemonid`
+- Untuk mencegah terbuatnya zombie process, child process akan dimatikan setelah child process selesai berjalan.
