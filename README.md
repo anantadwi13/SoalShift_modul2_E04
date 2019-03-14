@@ -1,16 +1,19 @@
 # SoalShift_modul2_E04
 
-3. 
+## No 3
+### Soal
 Diberikan file campur2.zip. Di dalam file tersebut terdapat folder “campur2”. 
 Buatlah program C yang dapat :
-i)  mengekstrak file zip tersebut.
-ii) menyimpan daftar file dari folder “campur2” yang memiliki ekstensi .txt ke dalam file daftar.txt. 
-Catatan:  
--Gunakan fork dan exec.
--Gunakan minimal 3 proses yang diakhiri dengan exec.
--Gunakan pipe
--Pastikan file daftar.txt dapat diakses dari text editor
+1. mengekstrak file zip tersebut.
+2. menyimpan daftar file dari folder “campur2” yang memiliki ekstensi .txt ke dalam file daftar.txt. 
 
+Catatan:  
+- Gunakan fork dan exec.
+- Gunakan minimal 3 proses yang diakhiri dengan exec.
+- Gunakan pipe
+- Pastikan file daftar.txt dapat diakses dari text editor
+
+### Jawab
 Jadi dalam soal ini, dibutuhkan 3 proses. Proses yang harus dijalankan pertama adalah proses untuk mengekstrak file campur2.zip. Proses ini dijalankan di proses grandchild. Grandchild merupakan fork dari proses child. Child merupakan fork dari parent process. Parent akan menunggu child dan child menunggu grandchild. Oleh karena itu ekstrak file ditaruh di proses grandchild. Syntax untuk melakukan unzip adalah:
 
 char *argv[4] = {"unzip", "-oq",args[1],NULL};
@@ -45,19 +48,21 @@ execv("bin/chmod",argv);
 
 chmod untuk mencukupi kebutuhan soal untuk melakukan exec 3 kali.
 
-4.
+## No 4
+### Soal
 Dalam direktori /home/[user]/Documents/makanan terdapat file makan_enak.txt yang berisikan daftar makanan terkenal di Surabaya. Elen sedang melakukan diet dan seringkali tergiur untuk membaca isi makan_enak.txt karena ngidam makanan enak. Sebagai teman yang baik, Anda membantu Elen dengan membuat program C yang berjalan setiap 5 detik untuk memeriksa apakah file makan_enak.txt pernah dibuka setidaknya 30 detik yang lalu (rentang 0 - 30 detik).
+
 Jika file itu pernah dibuka, program Anda akan membuat 1 file makan_sehat#.txt di direktori /home/[user]/Documents/makanan dengan '#' berisi bilangan bulat dari 1 sampai tak hingga untuk mengingatkan Elen agar berdiet.
 
 Contoh:
-File makan_enak.txt terakhir dibuka pada detik ke-1
-Pada detik ke-10 terdapat file makan_sehat1.txt dan makan_sehat2.txt
+- File makan_enak.txt terakhir dibuka pada detik ke-1
+- Pada detik ke-10 terdapat file makan_sehat1.txt dan makan_sehat2.txt
 
 Catatan: 
 dilarang menggunakan crontab
 Contoh nama file : makan_sehat1.txt, makan_sehat2.txt, dst
 
-
+### Jawab
 Dalam soal ini, harus digunakan daemon agar bisa berjalan tiap 5 detik sekali. Pertama-tama dibuat dulu variabel counter untuk nantinya digunakan untuk penamaan file.
 Selanjutnya, digunakan time_t dan ctime untuk mendapatkan waktu sekarang dan dimasukkan ke dalam array. Hanya jam dan tanggal saja yang diambil dan dimasukkan ke dalam array. Syntaxnya adalah
 
